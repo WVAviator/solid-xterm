@@ -21,6 +21,32 @@ interface TerminalProviderProps {
   children: ResolvedChildren;
 }
 
+/**
+ * The TerminalProvider component should wrap portions of your application that need to access methods on the terminal.
+ * Components within the TerminalProvider can access the terminal instance using the useTerminal hook.
+ * @example
+ * ```tsx
+ * import { TerminalProvider } from 'solid-xterm';
+ * import { useTerminal } from 'solid-xterm';
+ *
+ * const App = () => (
+ *  <TerminalProvider>
+ *      <MyComponent />
+ *  <TemrinalProvider />
+ * );
+ *
+ * const MyComponent = () => {
+ *   const { terminal } = useTerminal();
+ *   // Do something with the terminal instance
+ *   // For example, terminal.write('Hello, World!');
+ *   return (
+ *     <div>
+ *       <XTerm />
+ *     </div>
+ *   );
+ * };
+ * ```
+ */
 const TerminalProvider = ({ children }: TerminalProviderProps) => {
   const [terminal, setTerminal] = createSignal<Terminal | undefined>();
 
