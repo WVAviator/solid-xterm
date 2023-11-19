@@ -1,10 +1,4 @@
-import {
-  Accessor,
-  createEffect,
-  createSignal,
-  onCleanup,
-  onMount,
-} from 'solid-js';
+import { createEffect, onCleanup } from 'solid-js';
 import { Terminal } from 'xterm';
 import '../node_modules/xterm/css/xterm.css';
 
