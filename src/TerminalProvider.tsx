@@ -1,10 +1,4 @@
-import {
-  Accessor,
-  ResolvedChildren,
-  Setter,
-  createContext,
-  createSignal,
-} from 'solid-js';
+import { Accessor, JSX, Setter, createContext, createSignal } from 'solid-js';
 import { Terminal } from 'xterm';
 
 interface TerminalState {
@@ -18,7 +12,7 @@ export const TerminalContext = createContext<TerminalState>({
 });
 
 interface TerminalProviderProps {
-  children: ResolvedChildren;
+  children: JSX.Element;
 }
 
 /**
