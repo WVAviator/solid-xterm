@@ -1,4 +1,4 @@
-import { createEffect, onCleanup } from 'solid-js';
+import { createEffect, createSignal, onCleanup } from 'solid-js';
 import {
   ITerminalAddon,
   ITerminalInitOnlyOptions,
@@ -6,7 +6,6 @@ import {
   Terminal,
 } from 'xterm';
 import '../node_modules/xterm/css/xterm.css';
-import useTerminalContext from './useTerminalContext';
 
 export interface XTermProps {
   /**
@@ -35,101 +34,119 @@ export interface XTermProps {
   addons?: ITerminalAddon[];
 
   /**
-   * A callback that will be called when the bell is triggered.
+   * On mount, this callback will be called with the terminal instance.
+   * @param terminal The terminal object emitting the event.
+   * @returns A function that will be called when the component is unmounted.
    */
-  onBell?: () => void;
+  onMount?: (terminal: Terminal) => () => void;
+
+  /**
+   * A callback that will be called when the bell is triggered.
+   * @param terminal The terminal object emitting the event.
+   */
+  onBell?: (terminal: Terminal) => void;
 
   /**
    * A callback that will be called when a binary event fires. This is used to enable non UTF-8 conformant binary messages to be sent to the backend. Currently this is only used for a certain type of mouse reports that happen to be not UTF-8 compatible. The event value is a JS string, pass it to the underlying pty as binary data, e.g. `pty.write(Buffer.from(data, 'binary'))`.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#onbinary
    * @param data
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onBinary?: (data: string) => void;
+  onBinary?: (data: string, terminal: Terminal) => void;
 
   /**
    * A callback that will be called when the cursor moves.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#oncursormove
    * @param cursorPosition An object containing x and y properties representing the new cursor position.
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onCursorMove?: (cursorPosition: { x: number; y: number }) => void;
+  onCursorMove?: (
+    cursorPosition: { x: number; y: number },
+    terminal: Terminal
+  ) => void;
 
   /**
    * A callback that will be called when a data event fires. This happens for example when the user types or pastes into the terminal. The event value is whatever string results, in a typical setup, this should be passed on to the backing pty.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#ondata
    * @param data
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onData?: (data: string) => void;
+  onData?: (data: string, terminal: Terminal) => void;
 
   /**
    * A callback that will be called when a key is pressed. The event value contains the string that will be sent in the data event as well as the DOM event that triggered it.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#onkey
    * @param event An object containing a key property representing the string sent to the data event, and a domEvent property containing the DOM event that triggered the keypress.
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onKey?: (event: { key: string; domEvent: KeyboardEvent }) => void;
+  onKey?: (
+    event: { key: string; domEvent: KeyboardEvent },
+    terminal: Terminal
+  ) => void;
 
   /**
    * A callback that will be called when a line feed is added.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#onlinefeed
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onLineFeed?: () => void;
+  onLineFeed?: (terminal: Terminal) => void;
 
   /**
    * A callback that will be called when rows are rendered. The event value contains the start row and end rows of the rendered area (ranges from 0 to Terminal.rows - 1).
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#onrender
    * @param event An object containing start and end properties which represent the start and end rows (inclusive) of the rendered area.
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onRender?: (event: { start: number; end: number }) => void;
+  onRender?: (
+    event: { start: number; end: number },
+    terminal: Terminal
+  ) => void;
 
   /**
    * A callback that will be called when the terminal is resized.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#onresize
    * @param size An object containing cols and rows properties representing the new size.
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onResize?: (size: { cols: number; rows: number }) => void;
+  onResize?: (size: { cols: number; rows: number }, terminal: Terminal) => void;
 
   /**
    * A callback that will be called when a scroll occurs.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#onscroll
    * @param yPos The new y-position of the viewport.
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onScroll?: (yPos: number) => void;
+  onScroll?: (yPos: number, terminal: Terminal) => void;
 
   /**
    * A callback that will be called when a selection change occurs.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#onselectionchange
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onSelectionChange?: () => void;
+  onSelectionChange?: (terminal: Terminal) => void;
 
   /**
    * A callback that will be called when an OSC 0 or OSC 2 title change occurs.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#ontitlechange
    * @param title The new title.
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onTitleChange?: (title: string) => void;
+  onTitleChange?: (title: string, terminal: Terminal) => void;
 
   /**
    * A callback that will be called when data has been parsed by the terminal, after write is called. This event is useful to listen for any changes in the buffer.
    * This fires at most once per frame, after data parsing completes. Note that this can fire when there are still writes pending if there is a lot of data.
    * @see https://xtermjs.org/docs/api/terminal/classes/terminal/#onwriteparsed
-   * @returns
+   * @param terminal The terminal object emitting the event.
    */
-  onWriteParsed?: () => void;
+  onWriteParsed?: (terminal: Terminal) => void;
 }
 
 const XTerm = ({
   class: className = '',
   options = {},
   addons = [],
+  onMount,
   onBell,
   onBinary,
   onCursorMove,
@@ -143,7 +160,7 @@ const XTerm = ({
   onTitleChange,
   onWriteParsed,
 }: XTermProps) => {
-  const [terminal, setTerminal] = useTerminalContext();
+  const [terminal, setTerminal] = createSignal<Terminal | undefined>();
 
   const handleRef = (terminalContainerRef: HTMLDivElement) => {
     const newTerminal = new Terminal(options);
@@ -165,8 +182,19 @@ const XTerm = ({
 
   createEffect(() => {
     const currentTerminal = terminal();
+    if (!currentTerminal || !onMount) return;
+    const onMountCleanup = onMount(currentTerminal);
+    onCleanup(() => {
+      onMountCleanup();
+    });
+  });
+
+  createEffect(() => {
+    const currentTerminal = terminal();
     if (!currentTerminal || !onBell) return;
-    const onBellListener = currentTerminal.onBell(() => onBell());
+    const onBellListener = currentTerminal.onBell(() =>
+      onBell(currentTerminal)
+    );
     onCleanup(() => {
       onBellListener.dispose();
     });
@@ -175,7 +203,9 @@ const XTerm = ({
   createEffect(() => {
     const currentTerminal = terminal();
     if (!currentTerminal || !onBinary) return;
-    const onBinaryListener = currentTerminal.onBinary((data) => onBinary(data));
+    const onBinaryListener = currentTerminal.onBinary((data) =>
+      onBinary(data, currentTerminal)
+    );
     onCleanup(() => {
       onBinaryListener.dispose();
     });
@@ -189,7 +219,7 @@ const XTerm = ({
       const cursorX = currentTerminal.buffer.active.cursorX;
       const cursorY = currentTerminal.buffer.active.cursorY;
       const cursorPosition = { x: cursorX, y: cursorY };
-      onCursorMove(cursorPosition);
+      onCursorMove(cursorPosition, currentTerminal);
     });
     onCleanup(() => {
       onCursorMoveListener.dispose();
@@ -199,7 +229,9 @@ const XTerm = ({
   createEffect(() => {
     const currentTerminal = terminal();
     if (!currentTerminal || !onData) return;
-    const onDataListener = currentTerminal.onData((data) => onData(data));
+    const onDataListener = currentTerminal.onData((data) =>
+      onData(data, currentTerminal)
+    );
     onCleanup(() => {
       onDataListener.dispose();
     });
@@ -208,7 +240,9 @@ const XTerm = ({
   createEffect(() => {
     const currentTerminal = terminal();
     if (!currentTerminal || !onKey) return;
-    const onKeyListener = currentTerminal.onKey((event) => onKey(event));
+    const onKeyListener = currentTerminal.onKey((event) =>
+      onKey(event, currentTerminal)
+    );
     onCleanup(() => {
       onKeyListener.dispose();
     });
@@ -217,7 +251,9 @@ const XTerm = ({
   createEffect(() => {
     const currentTerminal = terminal();
     if (!currentTerminal || !onLineFeed) return;
-    const onLineFeedListener = currentTerminal.onLineFeed(() => onLineFeed());
+    const onLineFeedListener = currentTerminal.onLineFeed(() =>
+      onLineFeed(currentTerminal)
+    );
     onCleanup(() => {
       onLineFeedListener.dispose();
     });
@@ -227,7 +263,7 @@ const XTerm = ({
     const currentTerminal = terminal();
     if (!currentTerminal || !onRender) return;
     const onRenderListener = currentTerminal.onRender((event) =>
-      onRender(event)
+      onRender(event, currentTerminal)
     );
     onCleanup(() => {
       onRenderListener.dispose();
@@ -237,7 +273,9 @@ const XTerm = ({
   createEffect(() => {
     const currentTerminal = terminal();
     if (!currentTerminal || !onResize) return;
-    const onResizeListener = currentTerminal.onResize((size) => onResize(size));
+    const onResizeListener = currentTerminal.onResize((size) =>
+      onResize(size, currentTerminal)
+    );
     onCleanup(() => {
       onResizeListener.dispose();
     });
@@ -246,7 +284,9 @@ const XTerm = ({
   createEffect(() => {
     const currentTerminal = terminal();
     if (!currentTerminal || !onScroll) return;
-    const onScrollListener = currentTerminal.onScroll((yPos) => onScroll(yPos));
+    const onScrollListener = currentTerminal.onScroll((yPos) =>
+      onScroll(yPos, currentTerminal)
+    );
     onCleanup(() => {
       onScrollListener.dispose();
     });
@@ -256,7 +296,7 @@ const XTerm = ({
     const currentTerminal = terminal();
     if (!currentTerminal || !onSelectionChange) return;
     const onSelectionChangeListener = currentTerminal.onSelectionChange(() =>
-      onSelectionChange()
+      onSelectionChange(currentTerminal)
     );
     onCleanup(() => {
       onSelectionChangeListener.dispose();
@@ -267,7 +307,7 @@ const XTerm = ({
     const currentTerminal = terminal();
     if (!currentTerminal || !onTitleChange) return;
     const onTitleChangeListener = currentTerminal.onTitleChange((title) =>
-      onTitleChange(title)
+      onTitleChange(title, currentTerminal)
     );
     onCleanup(() => {
       onTitleChangeListener.dispose();
@@ -278,7 +318,7 @@ const XTerm = ({
     const currentTerminal = terminal();
     if (!currentTerminal || !onWriteParsed) return;
     const onWriteParsedListener = currentTerminal.onWriteParsed(() =>
-      onWriteParsed()
+      onWriteParsed(currentTerminal)
     );
     onCleanup(() => {
       onWriteParsedListener.dispose();

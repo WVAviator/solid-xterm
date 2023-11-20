@@ -1,10 +1,8 @@
 /** @jsxImportSource solid-js */
 
 import { render } from '@solidjs/testing-library';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
-import TerminalProvider from '../src/TerminalProvider';
+import { beforeAll, describe, expect, it } from 'vitest';
 import XTerm from '../src/XTerm';
-import useTerminal from '../src/useTerminal';
 
 describe('integration tests', () => {
   beforeAll(() => {});
@@ -19,25 +17,19 @@ describe('integration tests', () => {
 
   it('should render and write to the terminal', async () => {
     const App = () => {
-      const { onTerminalMount } = useTerminal();
-
-      onTerminalMount((terminal) => {
+      const handleTerminalMount = (terminal) => {
         terminal.write('Hello, World!');
         return () => {};
-      });
+      };
 
       return (
-        <div>
-          <XTerm />
-        </div>
+        <>
+          <XTerm onMount={handleTerminalMount} />
+        </>
       );
     };
 
-    const { findByText } = render(() => (
-      <TerminalProvider>
-        <App />
-      </TerminalProvider>
-    ));
+    const { findByText } = render(() => <App />);
 
     expect(await findByText('Hello, World!')).toBeTruthy();
   });
