@@ -1,6 +1,6 @@
-import { Accessor, createEffect, onCleanup, useContext } from 'solid-js';
-import { TerminalContext } from './TerminalProvider';
+import { Accessor, createEffect, onCleanup } from 'solid-js';
 import { Terminal } from 'xterm';
+import useTerminalContext from './useTerminalContext';
 
 type TerminalCleanupCallback = () => void;
 type TerminalMountCallback = (terminal: Terminal) => TerminalCleanupCallback;
@@ -45,14 +45,16 @@ interface UseTerminal {
  * @returns An object containing the current terminal and two callbacks for when the terminal mounts and dismounts.
  */
 const useTerminal = (): UseTerminal => {
-  const { terminal } = useContext(TerminalContext);
+  const [terminal] = useTerminalContext();
 
   const onTerminalMount = (callback: TerminalMountCallback) => {
-    createEffect(() => {
+    createEffect<Terminal | undefined>(() => {
       const currentTerminal = terminal();
       if (!currentTerminal) return;
+
       const cleanup = callback(currentTerminal);
       onCleanup(cleanup);
+      return currentTerminal;
     });
   };
 
@@ -62,7 +64,7 @@ const useTerminal = (): UseTerminal => {
         callback(previousTerminal);
       }
       return terminal();
-    });
+    }, terminal());
   };
 
   return { terminal, onTerminalMount, onTerminalDismount };

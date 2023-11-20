@@ -1,4 +1,4 @@
-import { createEffect, onCleanup, useContext } from 'solid-js';
+import { createEffect, onCleanup } from 'solid-js';
 import {
   ITerminalAddon,
   ITerminalInitOnlyOptions,
@@ -6,7 +6,7 @@ import {
   Terminal,
 } from 'xterm';
 import '../node_modules/xterm/css/xterm.css';
-import { TerminalContext } from './TerminalProvider';
+import useTerminalContext from './useTerminalContext';
 
 export interface XTermProps {
   /**
@@ -130,64 +130,64 @@ const XTerm = ({
   class: className = '',
   options = {},
   addons = [],
-  onBell = () => {},
-  onBinary = () => {},
-  onCursorMove = () => {},
-  onData = () => {},
-  onKey = () => {},
-  onLineFeed = () => {},
-  onRender = () => {},
-  onResize = () => {},
-  onScroll = () => {},
-  onSelectionChange = () => {},
-  onTitleChange = () => {},
-  onWriteParsed = () => {},
+  onBell,
+  onBinary,
+  onCursorMove,
+  onData,
+  onKey,
+  onLineFeed,
+  onRender,
+  onResize,
+  onScroll,
+  onSelectionChange,
+  onTitleChange,
+  onWriteParsed,
 }: XTermProps) => {
-  let terminalContainerRef: HTMLDivElement | undefined;
-  let terminal: Terminal | undefined;
+  const [terminal, setTerminal] = useTerminalContext();
 
-  const { setTerminal } = useContext(TerminalContext);
-
-  createEffect(() => {
-    if (!terminalContainerRef) return;
-
-    terminal = new Terminal(options);
-    terminal.open(terminalContainerRef);
+  const handleRef = (terminalContainerRef: HTMLDivElement) => {
+    const newTerminal = new Terminal(options);
+    newTerminal.open(terminalContainerRef);
 
     addons.forEach((addon) => {
-      terminal?.loadAddon(addon);
+      newTerminal?.loadAddon(addon);
     });
 
-    setTerminal && setTerminal(terminal);
+    setTerminal(newTerminal);
+  };
 
-    onCleanup(() => {
-      setTerminal(undefined);
-      terminal?.dispose();
-    });
+  onCleanup(() => {
+    const currentTerminal = terminal();
+    if (!currentTerminal) return;
+    currentTerminal.dispose();
+    setTerminal(undefined);
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onBellListener = terminal.onBell(() => onBell());
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onBell) return;
+    const onBellListener = currentTerminal.onBell(() => onBell());
     onCleanup(() => {
       onBellListener.dispose();
     });
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onBinaryListener = terminal.onBinary((data) => onBinary(data));
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onBinary) return;
+    const onBinaryListener = currentTerminal.onBinary((data) => onBinary(data));
     onCleanup(() => {
       onBinaryListener.dispose();
     });
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onCursorMoveListener = terminal.onCursorMove(() => {
-      if (!terminal) return;
-      const cursorX = terminal.buffer.active.cursorX;
-      const cursorY = terminal.buffer.active.cursorY;
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onCursorMove) return;
+    const onCursorMoveListener = currentTerminal.onCursorMove(() => {
+      if (!currentTerminal) return;
+      const cursorX = currentTerminal.buffer.active.cursorX;
+      const cursorY = currentTerminal.buffer.active.cursorY;
       const cursorPosition = { x: cursorX, y: cursorY };
       onCursorMove(cursorPosition);
     });
@@ -197,56 +197,65 @@ const XTerm = ({
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onDataListener = terminal.onData((data) => onData(data));
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onData) return;
+    const onDataListener = currentTerminal.onData((data) => onData(data));
     onCleanup(() => {
       onDataListener.dispose();
     });
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onKeyListener = terminal.onKey((event) => onKey(event));
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onKey) return;
+    const onKeyListener = currentTerminal.onKey((event) => onKey(event));
     onCleanup(() => {
       onKeyListener.dispose();
     });
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onLineFeedListener = terminal.onLineFeed(() => onLineFeed());
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onLineFeed) return;
+    const onLineFeedListener = currentTerminal.onLineFeed(() => onLineFeed());
     onCleanup(() => {
       onLineFeedListener.dispose();
     });
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onRenderListener = terminal.onRender((event) => onRender(event));
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onRender) return;
+    const onRenderListener = currentTerminal.onRender((event) =>
+      onRender(event)
+    );
     onCleanup(() => {
       onRenderListener.dispose();
     });
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onResizeListener = terminal.onResize((size) => onResize(size));
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onResize) return;
+    const onResizeListener = currentTerminal.onResize((size) => onResize(size));
     onCleanup(() => {
       onResizeListener.dispose();
     });
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onScrollListener = terminal.onScroll((yPos) => onScroll(yPos));
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onScroll) return;
+    const onScrollListener = currentTerminal.onScroll((yPos) => onScroll(yPos));
     onCleanup(() => {
       onScrollListener.dispose();
     });
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onSelectionChangeListener = terminal.onSelectionChange(() =>
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onSelectionChange) return;
+    const onSelectionChangeListener = currentTerminal.onSelectionChange(() =>
       onSelectionChange()
     );
     onCleanup(() => {
@@ -255,8 +264,9 @@ const XTerm = ({
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onTitleChangeListener = terminal.onTitleChange((title) =>
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onTitleChange) return;
+    const onTitleChangeListener = currentTerminal.onTitleChange((title) =>
       onTitleChange(title)
     );
     onCleanup(() => {
@@ -265,14 +275,17 @@ const XTerm = ({
   });
 
   createEffect(() => {
-    if (!terminal) return;
-    const onWriteParsedListener = terminal.onWriteParsed(() => onWriteParsed());
+    const currentTerminal = terminal();
+    if (!currentTerminal || !onWriteParsed) return;
+    const onWriteParsedListener = currentTerminal.onWriteParsed(() =>
+      onWriteParsed()
+    );
     onCleanup(() => {
       onWriteParsedListener.dispose();
     });
   });
 
-  return <div class={className} ref={terminalContainerRef}></div>;
+  return <div id="term-wrapper" class={className} ref={handleRef}></div>;
 };
 
 export default XTerm;

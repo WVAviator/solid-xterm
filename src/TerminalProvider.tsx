@@ -1,15 +1,15 @@
 import { Accessor, JSX, Setter, createContext, createSignal } from 'solid-js';
 import { Terminal } from 'xterm';
 
-interface TerminalState {
-  terminal: Accessor<Terminal | undefined>;
-  setTerminal: Setter<Terminal | undefined>;
-}
+type TerminalState =
+  | [
+      Accessor<Terminal | undefined>,
+      Setter<Terminal | undefined>
+      // setTerminal: (terminal: Terminal | undefined) => void;
+    ]
+  | undefined;
 
-export const TerminalContext = createContext<TerminalState>({
-  terminal: () => undefined,
-  setTerminal: () => undefined,
-});
+export const TerminalContext = createContext<TerminalState>();
 
 interface TerminalProviderProps {
   children: JSX.Element;
@@ -41,12 +41,12 @@ interface TerminalProviderProps {
  * };
  * ```
  */
-const TerminalProvider = ({ children }: TerminalProviderProps) => {
-  const [terminal, setTerminal] = createSignal<Terminal | undefined>();
+const TerminalProvider = (props: TerminalProviderProps) => {
+  const [terminal, setTerminal] = createSignal<Terminal | undefined>(undefined);
 
   return (
-    <TerminalContext.Provider value={{ terminal, setTerminal }}>
-      {children}
+    <TerminalContext.Provider value={[terminal, setTerminal]}>
+      {props.children}
     </TerminalContext.Provider>
   );
 };
