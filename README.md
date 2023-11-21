@@ -1,6 +1,6 @@
 # solid-xterm
 
-A simple reactive SolidJS component wrapper for xterm.js.
+A simple reactive SolidJS component wrapper for [xterm.js](https://xtermjs.org/).
 
 ## Installation
 
@@ -85,3 +85,7 @@ Please reference the [xterm.js docs](https://xtermjs.org/docs/) for additional i
 | onSelectionChange | Invoked when a selection change occurs                                   | terminal: Terminal                                                  |
 | onTitleChange     | Invoked when an OSC 0 or OSC 2 title change occurs                       | title: string, terminal: Terminal                                   |
 | onWriteParsed     | Invoked when data has been parsed by the terminal, after write is called | terminal: Terminal                                                  |
+
+## Contributing
+
+I'm new to SolidJS. You may have some better ideas regarding this component. If you're interested in contributing, please open an issue first to discuss what you would like to change.

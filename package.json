@@ -1,13 +1,11 @@
 {
   "name": "solid-xterm",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
+  "author": "WVAviator",
+  "license": "MIT",
   "scripts": {
-    "test": "vitest --no-threads",
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "test": "vitest --no-threads"
   },
   "dependencies": {
     "solid-js": "^1.8.5",
