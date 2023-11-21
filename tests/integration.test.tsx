@@ -10,9 +10,10 @@ describe('integration tests', () => {
     const App = () => {
       return <div>Hello, World!</div>;
     };
-    const { getByText } = render(() => <App />);
+    const { getByText, unmount } = render(() => <App />);
 
     expect(getByText('Hello, World!')).toBeTruthy();
+    unmount();
   });
 
   it('should render and write to the terminal', async () => {
@@ -29,8 +30,9 @@ describe('integration tests', () => {
       );
     };
 
-    const { findByText } = render(() => <App />);
+    const { findByText, unmount } = render(() => <App />);
 
     expect(await findByText('Hello, World!')).toBeTruthy();
+    unmount();
   });
 });

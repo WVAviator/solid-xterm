@@ -7,6 +7,7 @@ import {
 } from 'xterm';
 import '../node_modules/xterm/css/xterm.css';
 
+export type OnMountCleanup = () => void | (() => Promise<void>) | undefined;
 export interface XTermProps {
   /**
    * The CSS classes that will be applied to the terminal container.
@@ -38,7 +39,7 @@ export interface XTermProps {
    * @param terminal The terminal object emitting the event.
    * @returns A function that will be called when the component is unmounted.
    */
-  onMount?: (terminal: Terminal) => () => void;
+  onMount?: (terminal: Terminal) => OnMountCleanup | Promise<OnMountCleanup>;
 
   /**
    * A callback that will be called when the bell is triggered.
@@ -180,10 +181,10 @@ const XTerm = ({
     setTerminal(undefined);
   });
 
-  createEffect(() => {
+  createEffect(async () => {
     const currentTerminal = terminal();
     if (!currentTerminal || !onMount) return;
-    const onMountCleanup = onMount(currentTerminal);
+    const onMountCleanup = await onMount(currentTerminal);
     onCleanup(() => {
       onMountCleanup();
     });
