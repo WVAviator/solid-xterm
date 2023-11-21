@@ -1,6 +1,6 @@
 # solid-xterm
 
-A simple reactive SolidJS component wrapper for [xterm.js](https://xtermjs.org/).
+A simple reactive SolidJS component wrapper for Xterm.js.
 
 ## Installation
 
@@ -10,7 +10,7 @@ npm i solid-xterm
 
 ## Usage
 
-To get started, you can render a terminal using the XTerm component. This will create the terminal with default styling and automatically attach the terminal to the DOM.
+To get started, you can render a terminal using the `<XTerm />` component. This will create a terminal with default styling and automatically attach it to the DOM.
 
 ```tsx
 import { XTerm } from 'solid-xterm';
@@ -49,7 +49,9 @@ const MyTerminal = () => {
 };
 ```
 
-To gain access to the terminal instance, you can use the `onMount` prop. This will be invoked when the terminal is first mounted to the DOM. Optionally your callback can return a cleanup function that will be invoked when the terminal unmounts. Use this function to subscribe to events related to your backing pty and invoke functions on the terminal in response.
+To gain access to the terminal instance when it is created, you can use the `onMount` prop. This will be invoked when the terminal is first mounted to the DOM. Optionally your callback can return a cleanup function that will be invoked when the terminal unmounts.
+
+You should use the onMount function to subscribe to events related to your backing pty and invoke functions on the terminal in response.
 
 ```tsx
 import { XTerm, Terminal } from 'xterm';
