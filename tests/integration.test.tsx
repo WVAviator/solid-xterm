@@ -3,6 +3,7 @@
 import { render } from '@solidjs/testing-library';
 import { beforeAll, describe, expect, it } from 'vitest';
 import XTerm from '../src/XTerm';
+import { FitAddon } from '@xterm/addon-fit';
 
 describe('integration tests', () => {
   beforeAll(() => {});
@@ -33,6 +34,14 @@ describe('integration tests', () => {
     const { findByText, unmount } = render(() => <App />);
 
     expect(await findByText('Hello, World!')).toBeTruthy();
+    unmount();
+  });
+
+  it('should allow addons', async () => {
+    const App = () => {
+      return <XTerm addons={[FitAddon]} />;
+    };
+    const { unmount } = render(() => <App />);
     unmount();
   });
 });
