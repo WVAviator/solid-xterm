@@ -34,7 +34,7 @@ export interface XTermProps {
    * <XTerm addons={[SearchAddon, FitAddon]} />
    * ```
    */
-  addons?: ITerminalAddonConstructor[];
+  addons?: (ITerminalAddonConstructor | ITerminalAddon)[];
 
   /**
    * On mount, this callback will be called with the terminal instance.
@@ -170,7 +170,11 @@ const XTerm = ({
     newTerminal.open(terminalContainerRef);
 
     addons.forEach((addon) => {
-      newTerminal?.loadAddon(new addon());
+      if (typeof addon === 'function') {
+        newTerminal?.loadAddon(new addon());
+      } else {
+        newTerminal?.loadAddon(addon);
+      }
     });
 
     setTerminal(newTerminal);
