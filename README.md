@@ -145,7 +145,7 @@ const MyTerminal = () => {
   };
 
   // You can pass either an ITerminalAddon constructor or an instance, depending on whether you need to access it later.
-  return <XTerm addons={[FitAddon, searchAddon]} />;
+  return <XTerm addons={[FitAddon, searchAddon()]} />;
 };
 ```
 
