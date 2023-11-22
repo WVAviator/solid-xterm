@@ -8,6 +8,8 @@ import {
 import '../node_modules/xterm/css/xterm.css';
 
 export type OnMountCleanup = () => void | (() => Promise<void>) | undefined;
+
+export type ITerminalAddonConstructor = new (...args: any[]) => ITerminalAddon;
 export interface XTermProps {
   /**
    * The CSS classes that will be applied to the terminal container.
@@ -32,7 +34,7 @@ export interface XTermProps {
    * <XTerm addons={[SearchAddon, FitAddon]} />
    * ```
    */
-  addons?: ITerminalAddon[];
+  addons?: ITerminalAddonConstructor[];
 
   /**
    * On mount, this callback will be called with the terminal instance.
@@ -168,7 +170,7 @@ const XTerm = ({
     newTerminal.open(terminalContainerRef);
 
     addons.forEach((addon) => {
-      newTerminal?.loadAddon(addon);
+      newTerminal?.loadAddon(new addon());
     });
 
     setTerminal(newTerminal);
