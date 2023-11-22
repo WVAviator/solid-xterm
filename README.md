@@ -108,6 +108,23 @@ const MyTerminal = () => {
 };
 ```
 
+If you would like to customize the colors of the terminal, you can use the `theme` property on the options object. This property accepts a partial ITheme type, and any properties not provided will be filled in with the default values. For more information on the ITheme type, see the [xterm.js docs](https://xtermjs.org/docs/api/terminal/interfaces/itheme/).
+
+```tsx
+const MyTerminal = () => {
+  return (
+    <XTerm
+      options={{
+        theme: {
+          background: '#101010',
+          foreground: '#fdfdfd',
+        },
+      }}
+    />
+  );
+};
+```
+
 ## XTerm Addons
 
 XTerm.js has a number of [addons](https://xtermjs.org/docs/addons/) that can be used to extend the functionality of the terminal. There are officially supported addons as well as community-developed addons available. To use an addon, you must first import the addon class and then pass it as-is to the XTerm component as a prop. You do not need to instantiate the addon.
@@ -123,4 +140,4 @@ const MyTerminal = () => {
 
 ## Contributing
 
-I'm new to SolidJS. You may have some better ideas regarding this component. If you're interested in contributing, please open an issue first to discuss what you would like to change.
+I'm new to SolidJS and its reactivity patterns. You may have some better ideas regarding how this component is designed. If you're interested in contributing, please open an issue first to discuss what you would like to change.

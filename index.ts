@@ -11,4 +11,5 @@ export type {
   ITerminalOptions,
   ITerminalInitOnlyOptions,
   ITerminalAddon,
+  ITheme,
 } from 'xterm';
