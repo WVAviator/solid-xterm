@@ -668,6 +668,11 @@
   resolved "https://registry.yarnpkg.com/@xterm/addon-fit/-/addon-fit-0.9.0-beta.1.tgz#db1580c99e8b46f05d4006e7315dfe5f50215ddc"
   integrity sha512-HmGRUMMamUpQYuQBF2VP1LJ0xzqF85LMFfpaNu84t1Tsrl1lPKJWtqX9FDZ22Rf5q6bnKdbj44TRVAUHgDRbLA==
 
+"@xterm/addon-search@^0.14.0-beta.1":
+  version "0.14.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@xterm/addon-search/-/addon-search-0.14.0-beta.1.tgz#92cd959f2200b419d09f30f561bf0d574418571c"
+  integrity sha512-XPY5vn4ML7+W7lYwIeJu3CXh4Pw/oQ853s6gEng9+33VvREuzcPRr3aNBToQ0UMxmEkZmVtcKh2o1hbGl64deQ==
+
 abab@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.6.tgz#41b80f2c871d19686216b82309231cfd3cb3d291"
