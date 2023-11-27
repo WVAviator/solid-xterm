@@ -127,14 +127,25 @@ const MyTerminal = () => {
 
 ## XTerm Addons
 
-XTerm.js has a number of [addons](https://xtermjs.org/docs/addons/) that can be used to extend the functionality of the terminal. There are officially supported addons as well as community-developed addons available. To use an addon, you must first import the addon class and then pass it as-is to the XTerm component as a prop. You do not need to instantiate the addon.
+XTerm.js has a number of [addons](https://xtermjs.org/docs/addons/) that can be used to extend the functionality of the terminal. There are officially supported addons as well as community-developed addons available.
+
+To use an addon, you must first import the addon class and then either pass it as-is, or instantiate it first before passing it to the XTerm component in an array.
 
 ```tsx
 import { FitAddon } from '@xterm/addon-fit';
-import { WebglAddon } from '@xterm/addon-webgl';
+import { SearchAddon } from '@xterm/addon-search';
 
 const MyTerminal = () => {
-  return <XTerm addons={[FitAddon, WebglAddon]} />;
+  const searchAddon = createMemo(() => new SearchAddon());
+
+  // This is just an example function demonstrating a use case where some addons may need
+  // to be accessed after passing to the XTerm component. Memoization is recommended for this.
+  const handleSearch = (search: string) => {
+    searchAddon().findNext(search);
+  };
+
+  // You can pass either an ITerminalAddon constructor or an instance, depending on whether you need to access it later.
+  return <XTerm addons={[FitAddon, searchAddon()]} />;
 };
 ```
 

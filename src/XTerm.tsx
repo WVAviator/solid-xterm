@@ -23,7 +23,8 @@ export interface XTermProps {
   options?: ITerminalOptions & ITerminalInitOnlyOptions;
 
   /**
-   * An array of addons that will be loaded into XTerm. A list of officially supported addons can be found at https://github.com/xtermjs/xterm.js/tree/master/addons/
+   * An array of addons that will be loaded into XTerm. Addons can be passed as either an instance or a constructor.
+   * @see https://xtermjs.org/docs/api/addons/
    * @example
    * ```tsx
    * import { SearchAddon } from 'xterm-addon-search';
@@ -31,10 +32,12 @@ export interface XTermProps {
    *
    * ...
    *
-   * <XTerm addons={[SearchAddon, FitAddon]} />
+   * const searchAddon = createMemo(() => new SearchAddon());
+   *
+   * <XTerm addons={[searchAddon(), FitAddon]} />
    * ```
    */
-  addons?: ITerminalAddonConstructor[];
+  addons?: (ITerminalAddonConstructor | ITerminalAddon)[];
 
   /**
    * On mount, this callback will be called with the terminal instance.
@@ -170,7 +173,11 @@ const XTerm = ({
     newTerminal.open(terminalContainerRef);
 
     addons.forEach((addon) => {
-      newTerminal?.loadAddon(new addon());
+      if (typeof addon === 'function') {
+        newTerminal?.loadAddon(new addon());
+      } else {
+        newTerminal?.loadAddon(addon);
+      }
     });
 
     setTerminal(newTerminal);
