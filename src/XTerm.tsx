@@ -4,8 +4,8 @@ import {
   ITerminalInitOnlyOptions,
   ITerminalOptions,
   Terminal,
-} from 'xterm';
-import '../node_modules/xterm/css/xterm.css';
+} from '@xterm/xterm';
+import '../node_modules/@xterm/xterm/css/xterm.css';
 
 export type OnMountCleanup = () => void | (() => Promise<void>) | undefined;
 

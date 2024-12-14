@@ -12,8 +12,8 @@
     "test": "vitest --no-threads"
   },
   "dependencies": {
-    "solid-js": "^1.8.5",
-    "xterm": "^5.3.0"
+    "@xterm/xterm": "^5.5.0",
+    "solid-js": "^1.8.5"
   },
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.4",
